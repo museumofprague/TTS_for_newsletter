@@ -1,0 +1,282 @@
+:root {
+  --bg-1: #f3efe3;
+  --bg-2: #dfd3bf;
+  --panel: #fffdf8;
+  --ink: #1e1a14;
+  --muted: #6f6558;
+  --accent: #0a6e5a;
+  --accent-2: #12414f;
+  --warn: #9b3a30;
+  --line: #d7ccb9;
+  --v1: #d6f1e8;
+  --v2: #dbe7ff;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: radial-gradient(circle at 5% 0%, #f9f4e8 0, transparent 35%),
+              radial-gradient(circle at 100% 20%, #dbe6f4 0, transparent 30%),
+              linear-gradient(160deg, var(--bg-1), var(--bg-2));
+  min-height: 100vh;
+}
+
+.shell {
+  width: min(1080px, 94vw);
+  margin: 24px auto 56px;
+  display: grid;
+  gap: 16px;
+}
+
+.panel {
+  background: color-mix(in srgb, var(--panel) 92%, white 8%);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 6px 20px rgba(14, 11, 7, 0.08);
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.eyebrow {
+  margin: 0 0 4px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(1.55rem, 3vw, 2.35rem);
+}
+
+h2 {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+}
+
+.lede {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.hero-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+button {
+  cursor: pointer;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  padding: 10px 12px;
+  font-weight: 600;
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.secondary {
+  background: var(--accent-2);
+  color: #fff;
+}
+
+.ghost {
+  background: transparent;
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.provider-grid {
+  margin-top: 10px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  font-size: 0.92rem;
+}
+
+input, select, textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px;
+  font: inherit;
+  background: #fff;
+}
+
+.hidden {
+  display: none;
+}
+
+.dropzone {
+  border: 2px dashed var(--line);
+  border-radius: 12px;
+  padding: 18px;
+  text-align: center;
+  display: grid;
+  gap: 4px;
+  background: #fff;
+}
+
+.dropzone.dragover {
+  border-color: var(--accent);
+  background: #f6fffb;
+}
+
+.dropzone input {
+  display: none;
+}
+
+.tip {
+  color: var(--muted);
+  margin: 10px 0 0;
+}
+
+.actions-inline {
+  margin-top: 10px;
+}
+
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.progress-track {
+  margin-top: 8px;
+  height: 10px;
+  border-radius: 999px;
+  background: #ece4d6;
+  overflow: hidden;
+}
+
+.progress-bar {
+  width: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #2f8f74, #74c6b0);
+  transition: width 0.15s linear;
+}
+
+.bubble-list {
+  display: grid;
+  gap: 10px;
+}
+
+.bubble {
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.bubble.v1 { background: var(--v1); }
+.bubble.v2 { background: var(--v2); }
+.bubble.jingle { background: #efe9d1; }
+
+.bubble-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.bubble-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.bubble-actions button {
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+.meta {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.meta.error {
+  color: var(--warn);
+}
+
+.jingle-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.5fr) auto auto auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.jingle-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #efe8d0;
+  border: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.bubble-actions select {
+  min-width: 0;
+  max-width: 180px;
+}
+
+.player {
+  width: min(1080px, 94vw);
+  margin: 0 auto 30px;
+  display: block;
+}
+
+.scroll-top-btn {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 20;
+  min-width: 54px;
+  min-height: 54px;
+  border-radius: 999px;
+  box-shadow: 0 10px 24px rgba(14, 11, 7, 0.18);
+}
+
+@media (max-width: 860px) {
+  .hero {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .scroll-top-btn {
+    right: 14px;
+    bottom: 14px;
+  }
+}

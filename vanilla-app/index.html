@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Podcast TTS Studio - Vanilla JS</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E%F0%9F%A6%9C%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./mammoth_1-8-0.js"></script>
+</head>
+<body>
+  <main class="shell">
+    <header id="heroSection" class="hero panel">
+      <div>
+        <p class="eyebrow">Client-Only Workflow</p>
+        <h1>Podcast TTS Studio</h1>
+        <p class="lede">No backend. Import script lines, call TTS providers with fetch, then merge audio in the browser.</p>
+      </div>
+      <div class="hero-actions">
+        <button id="generateAllBtn" class="primary">Generate All</button>
+        <button id="playMergedBtn" class="secondary" disabled>Play Merged</button>
+        <button id="downloadMergedBtn" class="ghost" disabled>Download WAV</button>
+        <button id="logoutBtn" class="ghost" type="button">Logout</button>
+      </div>
+    </header>
+
+    <section class="panel">
+      <div class="status-row">
+        <h2>Status</h2>
+        <span id="statusText">Idle</span>
+      </div>
+      <div class="progress-track" aria-hidden="true">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+    </section>
+
+    <section class="panel settings">
+      <h2>Provider Settings</h2>
+      <div class="grid">
+        <label>
+          Provider
+          <select id="providerSelect">
+            <option value="elevenlabs">ElevenLabs</option>
+            <option value="openai">OpenAI</option>
+          </select>
+        </label>
+        <label>
+          API Key
+          <input id="apiKeyInput" type="password" placeholder="Stored encrypted in localStorage">
+        </label>
+        <label>
+          Language Code (ElevenLabs)
+          <input id="languageCodeInput" placeholder="Optional, e.g. en">
+        </label>
+      </div>
+
+      <div id="elevenlabsFields" class="grid provider-grid">
+        <label>
+          Voice ID (V1 - Bill Oxley)
+          <input id="elevenVoice1Input" value="T5cu6IU92Krx4mh43osx" placeholder="ElevenLabs voice id">
+        </label>
+        <label>
+          Voice ID (V2 - Verity X)
+          <input id="elevenVoice2Input" value="1hlpeD1ydbI2ow0Tt3EW" placeholder="ElevenLabs voice id">
+        </label>
+      </div>
+
+      <div id="openaiFields" class="grid provider-grid hidden">
+        <label>
+          Model
+          <select id="openaiModelSelect">
+            <option value="gpt-4o-mini-tts">gpt-4o-mini-tts</option>
+            <option value="tts-1">tts-1</option>
+            <option value="tts-1-hd">tts-1-hd</option>
+          </select>
+        </label>
+        <label>
+          Voice (V1)
+          <input id="openaiVoice1Input" value="alloy" placeholder="alloy">
+        </label>
+        <label>
+          Voice (V2)
+          <input id="openaiVoice2Input" value="ash" placeholder="ash">
+        </label>
+        <label>
+          Instructions (V1)
+          <textarea id="openaiInst1Input" rows="2" placeholder="Optional instructions">Voice Affect: Calm, composed, and reassuring. Competent and in control, instilling trust. Tone: Sincere, empathetic, with genuine concern for the customer and understanding of the situation. Pacing: Slower during the apology to allow for clarity and processing. Faster when offering solutions to signal action and resolution. Emotions: Calm reassurance, empathy, and gratitude. Pronunciation: Clear, precise: Ensures clarity, especially with key details. Focus on key words like 'refund' and 'patience.'</textarea>
+        </label>
+        <label>
+          Instructions (V2)
+          <textarea id="openaiInst2Input" rows="2" placeholder="Optional instructions">Affect/personality: A cheerful guide. Tone: Friendly, clear, and reassuring, creating a calm atmosphere and making the listener feel confident and comfortable. Pronunciation: Clear, articulate, and steady, ensuring each instruction is easily understood while maintaining a natural, conversational flow. Pause: Brief, purposeful pauses after key instructions (e.g., 'cross the street' and 'turn right') to allow time for the listener to process the information and follow along. Emotion: Warm and supportive, conveying empathy and care, ensuring the listener feels guided and safe throughout the journey.</textarea>
+        </label>
+      </div>
+
+      <div class="provider-grid">
+        <div class="status-row">
+          <h3>Voices</h3>
+          <button id="addVoiceBtn" type="button" class="secondary">Add Voice</button>
+        </div>
+        <p id="voiceHint" class="tip">For ElevenLabs, name = label and value = voice ID.</p>
+        <div id="voicesList"></div>
+      </div>
+
+      <div class="provider-grid">
+        <div class="status-row">
+          <h3>Jingles</h3>
+          <button id="addJingleBtn" type="button" class="secondary">Upload Jingle</button>
+        </div>
+        <p id="jingleHint" class="tip">Upload audio files. Blobs are stored in IndexedDB and reload automatically.</p>
+        <input id="jingleFileInput" type="file" accept="audio/*" hidden>
+        <div id="jinglesList"></div>
+      </div>
+    </section>
+
+    <section class="panel import-panel">
+      <h2>Import Script</h2>
+      <div id="dropzone" class="dropzone">
+        <strong>Drop TXT or DOCX here</strong>
+        <span>or choose a file</span>
+        <input id="fileInput" type="file" accept=".txt,.docx">
+      </div>
+      <div class="actions-inline">
+        <button id="chooseFileBtn" class="secondary">Load File</button>
+      </div>
+      <p class="tip">Supported line formats: <code>V1: hello</code>, <code>V2: hello</code>, <code>#1#</code>, <code>#J2#</code>. Jingle markers ignore text and fall back to the first jingle when out of range.</p>
+    </section>
+
+    <section class="panel composer">
+      <h2>Add Line</h2>
+      <div class="grid">
+        <label>
+          Speaker
+          <select id="speakerSelect">
+            <option value="V1">V1</option>
+            <option value="V2">V2</option>
+          </select>
+        </label>
+        <label>
+          Jingle
+          <select id="jingleSelect">
+            <option value="">None</option>
+          </select>
+        </label>
+        <label>
+          Insert Position
+          <select id="insertPositionSelect"></select>
+        </label>
+      </div>
+      <label>
+        Text
+        <textarea id="lineTextInput" rows="3" placeholder="Type a line"></textarea>
+      </label>
+      <button id="addLineBtn" class="secondary">Add Line</button>
+    </section>
+
+    <section class="panel transcript">
+      <div class="status-row">
+        <h2>Transcript</h2>
+        <span id="countText">0 lines</span>
+      </div>
+      <div id="bubbleList" class="bubble-list"></div>
+    </section>
+  </main>
+
+  <button id="scrollTopBtn" class="scroll-top-btn hidden" type="button">Up</button>
+
+  <audio id="player" class="player" controls></audio>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
